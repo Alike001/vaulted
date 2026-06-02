@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/cdr-api/:path*",
+      "destination": "http://172.192.41.96:1317/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
