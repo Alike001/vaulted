@@ -9,7 +9,6 @@ export function Footer() {
           <span className="text-ink">Story Confidential Data Rails</span> · Aeneid testnet
         </span>
         <div className="flex items-center gap-4">
-          <span>by @IamAlikeX</span>
           <a
             href="https://github.com/Alike001"
             target="_blank"

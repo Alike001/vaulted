@@ -1,5 +1,5 @@
-import type { PublicClient, WalletClient } from 'viem'
-import { EmptyVaultError } from '@piplabs/cdr-sdk'
+import { toHex, type PublicClient, type WalletClient } from 'viem'
+import { EmptyVaultError, uuidToLabel } from '@piplabs/cdr-sdk'
 import { getCDRClient } from './cdr'
 import { buildConditions } from './conditions'
 import { secretsStore, type SecretMeta } from './storage'
@@ -23,17 +23,29 @@ export async function createSecret(args: CreateSecretArgs): Promise<SecretMeta> 
   const client = await getCDRClient(publicClient, walletClient)
   const cond = buildConditions(owner, reader)
 
-  const { uuid, txHashes } = await client.uploader.uploadCDR({
-    dataKey: enc.encode(value),
+  // NOTE: we DON'T use uploader.uploadCDR — it hardcodes away skipConditionValidation,
+  // so it rejects our EOA read condition. Do the 3 steps manually instead.
+  // 1) allocate the vault (skip the contract-interface check for the EOA read gate)
+  const { uuid, txHash: allocateTx } = await client.uploader.allocate({
     updatable: false,
     writeConditionAddr: cond.writeConditionAddr,
     writeConditionData: cond.writeConditionData,
     readConditionAddr: cond.readConditionAddr,
     readConditionData: cond.readConditionData,
+    skipConditionValidation: true,
+  })
+  // 2) encrypt the secret to the DKG key, bound to this vault's label
+  const label = uuidToLabel(uuid)
+  const ciphertext = await client.uploader.encryptDataKey({
+    dataKey: enc.encode(value),
+    label,
+  })
+  // 3) write the ciphertext into the vault
+  await client.uploader.write({
+    uuid,
     accessAuxData: '0x',
-    // EOA read condition: skip the SDK's contract-interface preflight
-    ...(cond.skipConditionValidation ? { skipConditionValidation: true } : {}),
-  } as Parameters<typeof client.uploader.uploadCDR>[0])
+    encryptedData: toHex(ciphertext.raw),
+  })
 
   const meta: SecretMeta = {
     uuid,
@@ -41,10 +53,10 @@ export async function createSecret(args: CreateSecretArgs): Promise<SecretMeta> 
     owner,
     reader,
     createdAt: Date.now(),
-    allocateTx: txHashes?.allocate,
+    allocateTx,
   }
   secretsStore.add(meta)
-  audit.add({ uuid, type: 'create', addr: owner, ts: Date.now(), tx: txHashes?.allocate })
+  audit.add({ uuid, type: 'create', addr: owner, ts: Date.now(), tx: allocateTx })
   audit.add({ uuid, type: 'grant', addr: reader, ts: Date.now() })
   return meta
 }
