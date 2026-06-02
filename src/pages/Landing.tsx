@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { ShieldCheck, Lock, UserCheck, Network, ArrowRight } from 'lucide-react'
 import { ConnectBar } from '../components/ConnectBar'
 import { Footer } from '../components/Footer'
+import { BackgroundBeams } from '@/components/ui/background-beams'
+import { HyperText } from '@/components/ui/hyper-text'
 
 const STEPS = [
   {
@@ -26,37 +28,47 @@ export function Landing() {
     <div className="flex min-h-screen flex-col">
       <ConnectBar />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4">
-        <section className="flex flex-col items-center py-20 text-center">
-          <span className="pill mb-6 text-brand">
-            <ShieldCheck className="h-3.5 w-3.5" /> Powered by Story Confidential Data Rails
-          </span>
-          <h1 className="max-w-3xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            Share secrets with one wallet.
-            <br />
-            <span className="text-brand">Nobody else can read them.</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-muted">
-            Vaulted is an encrypted secrets manager for teams. Encrypt an API key once, grant
-            access to a single wallet, and let a validator network — not a database — enforce who
-            can decrypt.
-          </p>
-          <div className="mt-8 flex gap-3">
-            <Link to="/app" className="btn-primary">
-              Launch app <ArrowRight className="h-4 w-4" />
-            </Link>
-            <a
-              href="https://docs.story.foundation/developers/cdr-sdk/overview"
-              target="_blank"
-              rel="noreferrer"
-              className="btn-ghost"
+        {/* Hero — animated beams behind, content above */}
+        <section className="relative flex flex-col items-center overflow-hidden py-24 text-center">
+          <BackgroundBeams className="opacity-60 [mask-image:radial-gradient(60%_50%_at_50%_40%,white,transparent)]" />
+          <div className="relative z-10 flex flex-col items-center">
+            <span className="pill mb-6 text-brand">
+              <ShieldCheck className="h-3.5 w-3.5" /> Powered by Story Confidential Data Rails
+            </span>
+            <h1 className="max-w-3xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+              Share secrets with one wallet.
+            </h1>
+            <HyperText
+              as="div"
+              duration={1200}
+              animateOnHover
+              className="mt-1 whitespace-nowrap py-0 text-center text-2xl font-bold tracking-tight text-brand sm:text-4xl md:text-5xl"
             >
-              What is CDR?
-            </a>
+              Nobody else can read them.
+            </HyperText>
+            <p className="mt-6 max-w-xl text-muted">
+              Vaulted is an encrypted secrets manager for teams. Encrypt an API key once, grant
+              access to a single wallet, and let a validator network — not a database — enforce who
+              can decrypt.
+            </p>
+            <div className="mt-8 flex gap-3">
+              <Link to="/app" className="btn-primary">
+                Launch app <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="https://docs.story.foundation/developers/cdr-sdk/overview"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-ghost"
+              >
+                What is CDR?
+              </a>
+            </div>
+            <p className="mt-5 font-mono text-xs text-muted">
+              “I share the key — the one wallet I named decrypts it. I, the creator, get access
+              denied.”
+            </p>
           </div>
-          <p className="mt-4 font-mono text-xs text-muted">
-            “I share the key — the one wallet I named decrypts it. I, the creator, get access
-            denied.”
-          </p>
         </section>
 
         <section className="grid gap-4 pb-16 sm:grid-cols-3">
