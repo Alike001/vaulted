@@ -84,8 +84,13 @@ export async function readSecret(
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
     let reason: 'denied' | 'empty' | 'timeout' | 'error'
+    // The SDK reports "got <collected>/<expected>" when collecting partials.
+    // Zero collected means NO validator produced a share for this requester —
+    // i.e. the wallet isn't the named reader. That's a denial, not a flaky
+    // timeout (a real timeout looks like "got 2/3" — some shares, not enough).
+    const zeroPartials = /got\s+0\/\d+/i.test(message)
     if (e instanceof EmptyVaultError) reason = 'empty'
-    else if (/revert|denied|not authoriz|condition/i.test(message)) reason = 'denied'
+    else if (zeroPartials || /revert|denied|not authoriz|condition/i.test(message)) reason = 'denied'
     else if (/timeout|timed out|threshold/i.test(message)) reason = 'timeout'
     else reason = 'error'
     if (reason === 'denied') audit.add({ uuid, type: 'denied', addr: me || 'unknown', ts: Date.now() })

@@ -10,7 +10,7 @@ export function Footer() {
         </span>
         <div className="flex items-center gap-4">
           <a
-            href="https://github.com/Alike001"
+            href="https://github.com/Alike001/vaulted"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 hover:text-ink"
