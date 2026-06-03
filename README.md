@@ -2,7 +2,7 @@
 
 **Stop pasting API keys into Slack. Encrypt a secret once, grant it to exactly one wallet, and let a validator network — not a database — decide who can read it.**
 
-**Demo video: [TODO — record the 2-minute walkthrough before submitting]**
+**[▶ Watch the 2-minute demo](https://youtu.be/qrcbXeCcaPI)**
 
 **Live demo: [vaulted-lovat.vercel.app](https://vaulted-lovat.vercel.app/)**
 
